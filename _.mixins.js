@@ -20,11 +20,16 @@ define(['underscore'], function() {
 					if ( _.indexOf(expected_type, actual_type) === -1 ) {
 						// not present
 						throw new TypeError("The property '" + prop_name + "' from " + d.id + " is not a '" + expected_type + "' but a '" + actual_type + "' || " + d.aux);
-					} else {
-						// present
 					}
 
+				} else if ( typeof expected_type === 'object' ) {
 
+					// go recursive
+					_.interface({
+						id: d.id + ':' + prop_name,
+						obj: d.obj[ prop_name ],
+						typeofs: expected_type,
+					});
 
 				} else {
 					// only one type accepted
