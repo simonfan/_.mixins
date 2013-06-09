@@ -1,5 +1,5 @@
 {
-	"name": "Boilerplate Component",
+	"name": "_.mixins",
 	"version": "0.0.1",
 	"dependencies": {
 		"underscore": "latest",
