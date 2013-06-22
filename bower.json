@@ -8,5 +8,5 @@
 	    "qunit": "latest"
 	},
 
-	"main": "component.js"
+	"main": "_.mixins.js"
 }
