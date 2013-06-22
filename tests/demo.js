@@ -7,9 +7,8 @@ define(['_.mixins'], function(undef) {
 		str: 'string',
 	}
 
-	_.interface({
+	_.interface(data, {
 		id: 'Demo interface',
-		obj: data,
 		typeofs: {
 			no: 'number',
 			obj: 'object',

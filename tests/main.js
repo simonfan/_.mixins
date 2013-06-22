@@ -15,7 +15,7 @@ require.config({
 		'tests-main': 'tests',	// the main file for tests
 
 		// other tests go here
-		'example-tests': 'tests/example-tests',
+		'interface-tests': 'tests/interface',
 	},
 	shim: {
 		'backbone': {
