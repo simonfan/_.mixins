@@ -24,6 +24,7 @@ return function() {
 		}
 	});
 
+
 	test('single: valid interface', function() {
 		var valid = false;
 
