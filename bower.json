@@ -1,6 +1,6 @@
 {
 	"name": "_.mixins",
-	"version": "1.0",
+	"version": "1.0.0",
 	"dependencies": {
 		"underscore": "latest",
 		"requirejs": "latest",
