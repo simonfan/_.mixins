@@ -107,6 +107,9 @@ define(['underscore'], function() {
 
 	//////// ARGS /////////
 	_.mixin({
-		args: function(args) { return Array.prototype.slice.call(args, 0); }
+		args: function(args, ini, end) {
+			ini = ini || 0;
+			return Array.prototype.slice.call(args, ini, end);
+		}
 	})
 });

@@ -2,6 +2,7 @@ var deps = [
 	'underscore',	// underscore is a dep and not a test case: remember to skip it.
 
 	'interface-tests',
+	'args-tests',
 ];
 
 

@@ -16,6 +16,7 @@ require.config({
 
 		// other tests go here
 		'interface-tests': 'tests/interface',
+		'args-tests': 'tests/args',
 	},
 	shim: {
 		'backbone': {

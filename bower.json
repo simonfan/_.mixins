@@ -4,7 +4,9 @@
 	"dependencies": {
 		"underscore": "latest",
 		"requirejs": "latest",
+	},
 
+	"devDependencies": {
 	    "qunit": "latest"
 	},
 
