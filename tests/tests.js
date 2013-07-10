@@ -3,6 +3,7 @@ var deps = [
 
 	'interface-tests',
 	'args-tests',
+	'branch-tests'
 ];
 
 

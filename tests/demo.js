@@ -30,4 +30,41 @@ define(['_.mixins'], function(undef) {
 	};
 
 	_argsTest('aaasd', 8918932, {adqwe: 10});
+
+
+
+
+
+
+
+
+
+
+/*	window.root = {
+		fruits: {
+			yellow: {
+				bananas: 'bananas',
+				pineaples: 'pineaples',
+			},
+			red: {
+				apples: 'apples'
+			},
+			green: {
+				watermelons: 'watermelons',
+			}
+		},
+		vegetables: {
+			green: {
+				lettuce: 'lettuce',
+			},
+			yellow: {
+				potato: 'potato',
+			}
+		}
+	}
+*/
+
+	window.branch_tomato = ['vegetables','red','tomato'];
+	window.branch_melon = ['fruits','yellow','melon'];
+	window.branch_meat = ['meats','red','beef']; 
 });
