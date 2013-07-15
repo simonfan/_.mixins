@@ -2,11 +2,40 @@ define(['_.mixins', 'eventemitter2'], function(undef, Eventemitter2) {
 
 return function() {
 
-	module('_.getset(data)');
+	module('_.getset(data)', {
+		setup: function() {
+			window.control = {};
+			window.obj = _.extend({}, Eventemitter2.prototype);
+
+
+			obj.state = function(name, state) {
+				return _.getset({
+					context: this,
+					obj: 'states',
+					name: name,
+					value: state,
+					options: {
+						events: 'set-state',
+						evaluate: true
+					}
+
+				})
+			};
+
+			// listen to ehte set-state events and log them on the control object
+			obj.on('set-state', function(statename, states) {
+				control[statename] = states[statename];
+			});
+		},
+		teardown: function() {
+			delete window.control;
+			delete window.obj;
+		}
+	});
 	/*
 		data: {
 			context: obj,
-			root: obj || string,
+			obj: obj || string,
 			name: string,
 			value: whatever,
 			options: {
@@ -16,28 +45,6 @@ return function() {
 		}
 	*/
 	test('_.getset as single setter', function() {
-		var control = {},
-			obj = _.extend({}, Eventemitter2.prototype);
-
-
-		obj.state = function(name, state) {
-			return _.getset({
-				context: this,
-				root: 'states',
-				name: name,
-				value: state,
-				options: {
-					events: 'set-state',
-					evaluate: true
-				}
-
-			})
-		};
-
-		// listen to ehte set-state events and log them on the control object
-		obj.on('set-state', function(statename, states) {
-			control[statename] = states[statename];
-		});
 
 		// create a test object
 		var teststate = {
@@ -60,29 +67,6 @@ return function() {
 
 
 	test('_.getset as multiple setter', function() {
-		var control = {},
-			obj = _.extend({}, Eventemitter2.prototype);
-
-
-		obj.state = function(name, state) {
-			return _.getset({
-				context: this,
-				root: 'states',
-				name: name,
-				value: state,
-				options: {
-					events: 'set-state',
-					evaluate: true
-				}
-
-			})
-		};
-
-		// listen to ehte set-state events and log them on the control object
-		obj.on('set-state', function(statename, states) {
-			control[statename] = states[statename];
-		});
-
 		// create a test object
 		var a = 'aaa',
 			b = {
@@ -100,7 +84,33 @@ return function() {
 			a: a, b: b, c: c
 		}, 'settings correct');
 
-		deepEqual(control, obj.states, 'events correctly fired')
+		deepEqual(control, obj.states, 'events correctly fired');
+
+
+	});
+
+
+	test('_.getset as inteligent getter', function() {
+		// listen to ehte set-state events and log them on the control object
+		obj.on('set-state', function(statename, states) {
+			control[statename] = states[statename];
+		});
+
+		// create a test object
+		var a = 'aaa',
+			b = {
+				oo: 'ss',
+				eqweqwe: 'qweqweqwe qwe qwe qe'
+			},
+			c = function() {
+				return 'bananas'
+			};
+
+		// set the states
+		obj.state({ a: a, b: b, c: c });
+
+		deepEqual(obj.state('a'), obj.states['a'], 'getting simple data correctly');
+		deepEqual(obj.state('c'), obj.states['c'](), 'getting intelligent data correctly');
 
 
 	});

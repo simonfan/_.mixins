@@ -227,15 +227,15 @@ define(['underscore'], function() {
 	////////////////////////////
 	var gs = {};
 
-	gs.set = function(context, root, name, value, options) {
+	gs.set = function(context, obj, name, value, options) {
 		// only set if the new value is different from the old value
-		if (root[ name ] !== value) {
+		if (obj[ name ] !== value) {
 			// set
-			root[ name ] = value;
+			obj[ name ] = value;
 
 			// if there should be emitted any kind of events..
 			if (options.events) {
-				gs.emit(context, options.events, name, root);
+				gs.emit(context, options.events, name, obj);
 			}
 		}
 
@@ -243,7 +243,7 @@ define(['underscore'], function() {
 	};
 
 
-	gs.emit = function(context, events, propname, root) {
+	gs.emit = function(context, events, propname, obj) {
 		// determine the emitting method
 		var emit = typeof context.emit === 'function' ? context.emit : typeof context.trigger === 'function' ? context.trigger : false;
 
@@ -282,9 +282,9 @@ define(['underscore'], function() {
 
 		} else if (typeof events === 'function') {
 			// the events objec it a function. Call it within this context and pass
-			// in the root object. Then re-call the emit event with the results
-			var evts = events.call(this, root);
-			gs.emit(context, evts, propname, root);
+			// in the obj object. Then re-call the emit event with the results
+			var evts = events.call(this, obj);
+			gs.emit(context, evts, propname, obj);
 
 		} else {
 			// the events is a string, so use the arguments passed after the events
@@ -299,8 +299,8 @@ define(['underscore'], function() {
 		return context;
 	};
 
-	gs.get = function(root, name, options) {
-		var value = root[ name ];
+	gs.get = function(obj, name, options) {
+		var value = obj[ name ];
 		return (options.evaluate && typeof value === 'function') ? value() : value; 
 	};
 
@@ -310,7 +310,7 @@ define(['underscore'], function() {
 			/*
 				data: {
 					context: obj,
-					root: obj || string,
+					obj: obj || string,
 					name: string,
 					value: whatever,
 					options: {
@@ -323,14 +323,14 @@ define(['underscore'], function() {
 				name = data.name,
 				value = data.value,
 				options = data.options || {},
-				root;
+				obj;
 
-			// prevent root from being non-object
-			// if there is no root, create the object on the context
-			if (typeof data.root === 'string') {
-				context[data.root] = root = context[data.root] || {};
+			// prevent obj from being non-object
+			// if there is no obj, create the object on the context
+			if (typeof data.obj === 'string') {
+				context[data.obj] = obj = context[data.obj] || {};
 			} else {
-				root = data.root;
+				obj = data.obj;
 			}
 
 			if (typeof name === 'object') {
@@ -338,7 +338,7 @@ define(['underscore'], function() {
 				_.each(name, function(val, name) {
 					return _.getset({
 						context: context,
-						root: root,
+						obj: obj,
 						name: name,
 						value: val,
 						options: options
@@ -349,10 +349,10 @@ define(['underscore'], function() {
 
 			} else if (typeof name === 'string' && typeof value !== 'undefined') {
 				// SET SINGLE
-				return gs.set(context, root, name, value, options);
+				return gs.set(context, obj, name, value, options);
 			} else {
 				// GET 
-				return gs.get(root, name, options);
+				return gs.get(obj, name, options);
 			}
 		},
 	});
