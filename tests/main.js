@@ -5,6 +5,9 @@ require.config({
 		// basic libraries
 		'underscore': 'components/underscore/underscore',
 
+		// test purpose libraries
+		'eventemitter2': 'components/eventemitter2/lib/eventemitter2',
+
 		// the module files go here
 		'_.mixins': '../_.mixins',
 
@@ -18,6 +21,7 @@ require.config({
 		'interface-tests': 'tests/interface',
 		'args-tests': 'tests/args',
 		'branch-tests': 'tests/branch',
+		'getset-tests': 'tests/getset',
 	},
 	shim: {
 		'backbone': {

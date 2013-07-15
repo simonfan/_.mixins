@@ -218,4 +218,145 @@ define(['underscore'], function() {
 		}
 
 	});
+
+
+
+
+	////////////////////////////
+	//////// getset ////////////
+	////////////////////////////
+	var gs = {};
+
+	gs.set = function(context, root, name, value, options) {
+		// only set if the new value is different from the old value
+		if (root[ name ] !== value) {
+			// set
+			root[ name ] = value;
+
+			// if there should be emitted any kind of events..
+			if (options.events) {
+				gs.emit(context, options.events, name, root);
+			}
+		}
+
+		return this;
+	};
+
+
+	gs.emit = function(context, events, propname, root) {
+		// determine the emitting method
+		var emit = typeof context.emit === 'function' ? context.emit : typeof context.trigger === 'function' ? context.trigger : false;
+
+		if (!emit) {
+			console.log('Hey, I\'m from _.mixins, _.getset, you told me to emit some events when a value was set.. I won\'t throw an Error, but I should, as you have not provided me .trigger or .emit methods!!')
+			return context;
+		}
+
+		// if there is an emit method, check on the events type
+		if (_.isArray(events)) {
+			var args = _.args(arguments, 2);
+				// remove the original events argument passed to emit.
+			_.each(events, function(evt, index) {
+				var emitargs = _.clone(args);
+
+				// add the evt to the arguments list
+				emitargs.unshift(evt);
+
+				// emit
+				emit.apply(context, emitargs);
+			});
+
+		} else if (typeof events === 'object') {
+			// the events object is a hash of arguments keyed by events name
+			// events is an object
+			var args = _.args(arguments, 2)
+			_.each(events, function(args, evt) {
+				var emitargs = _.clone(args);
+
+				// add the evt to the arguments list
+				emitargs.unshift(evt);
+
+				// emit
+				emit.apply(_this, emitargs);
+			});
+
+		} else if (typeof events === 'function') {
+			// the events objec it a function. Call it within this context and pass
+			// in the root object. Then re-call the emit event with the results
+			var evts = events.call(this, root);
+			gs.emit(context, evts, propname, root);
+
+		} else {
+			// the events is a string, so use the arguments passed after the events
+			// name as emitting arguments
+			// events is string
+			var args = _.args(arguments, 1);
+
+			// emit
+			emit.apply(context, args);
+		}
+
+		return context;
+	};
+
+	gs.get = function(root, name, options) {
+		var value = root[ name ];
+		return (options.evaluate && typeof value === 'function') ? value() : value; 
+	};
+
+
+	_.mixin({
+		getset: function(data) {
+			/*
+				data: {
+					context: obj,
+					root: obj || string,
+					name: string,
+					value: whatever,
+					options: {
+						events: string || array || object || function,
+						evaluate: boolean
+					}
+				}
+			*/
+			var context = data.context,
+				name = data.name,
+				value = data.value,
+				options = data.options || {},
+				root;
+
+			// prevent root from being non-object
+			// if there is no root, create the object on the context
+			if (typeof data.root === 'string') {
+				context[data.root] = root = context[data.root] || {};
+			} else {
+				root = data.root;
+			}
+
+			if (typeof name === 'object') {
+				// LOOP SET
+				_.each(name, function(val, name) {
+					return _.getset({
+						context: context,
+						root: root,
+						name: name,
+						value: val,
+						options: options
+					});
+				});
+
+				return this;
+
+			} else if (typeof name === 'string' && typeof value !== 'undefined') {
+				// SET SINGLE
+				return gs.set(context, root, name, value, options);
+			} else {
+				// GET 
+				return gs.get(root, name, options);
+			}
+		},
+	});
+
+
+
 });
