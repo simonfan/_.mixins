@@ -299,9 +299,24 @@ define(['underscore'], function() {
 		return context;
 	};
 
-	gs.get = function(obj, name, options) {
+	gs.get = function(context, obj, name, options) {
 		var value = obj[ name ];
-		return (options.evaluate && typeof value === 'function') ? value() : value; 
+
+		// check if there is an evaluation to be made
+		if (options.evaluate) {
+
+			
+			if (typeof options.evaluate === 'boolean' && typeof value === 'function') {
+				// if evaluate is a boolean (remember it is not a falsey value) and the value is a function itself
+				value = value.call(context);
+
+			} else if (typeof options.evaluate === 'function') {
+				// if options.evaluate is a function, call it and pass it the value
+				value = options.evaluate.call(context, value);
+			}
+		}
+
+		return value;
 	};
 
 
@@ -313,17 +328,16 @@ define(['underscore'], function() {
 					obj: obj || string,
 					name: string,
 					value: whatever,
-					iterator: function,
 					options: {
+						iterate: function,
 						events: string || array || object || function,
-						evaluate: boolean
+						evaluate: boolean || function
 					}
 				}
 			*/
 			var context = data.context,
 				name = data.name,
 				value = data.value,
-				iterator = data.iterator,
 				options = data.options || {},
 				obj;
 
@@ -343,7 +357,6 @@ define(['underscore'], function() {
 						obj: obj,
 						name: name,
 						value: val,
-						iterator: iterator,
 						options: options
 					});
 				});
@@ -351,15 +364,14 @@ define(['underscore'], function() {
 				return this;
 
 			} else if (typeof name === 'string' && typeof value !== 'undefined') {
-				// PASS TO THE ITERATOR
-
-				value = (typeof iterator === 'function') ? iterator.call(context, name, value) : value;
+				// PASS TO THE iterate
+				value = (typeof options.iterate === 'function') ? options.iterate.call(context, name, value) : value;
 
 				// SET SINGLE
 				return gs.set(context, obj, name, value, options);
 			} else {
 				// GET 
-				return gs.get(obj, name, options);
+				return gs.get(context, obj, name, options);
 			}
 		},
 	});

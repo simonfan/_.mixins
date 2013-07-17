@@ -16,12 +16,12 @@ return function() {
 					obj: 'states',
 					name: name,
 					value: state,
-					iterator: function(name, state) {
-						this.sideEffect[ name ] = state;
-
-						return state;
-					},
 					options: {
+						iterate: function(name, state) {
+							this.sideEffect[ name ] = state;
+
+							return state;
+						},
 						events: 'set-state',
 						evaluate: true
 					}
@@ -45,10 +45,10 @@ return function() {
 			obj: obj || string,
 			name: string,
 			value: whatever,
-			iterator: function,
+			iterate: function,
 			options: {
 				events: string || array || object || function,
-				evaluate: boolean
+				evaluate: boolean || function
 			}
 		}
 	*/
@@ -133,6 +133,62 @@ return function() {
 
 	});
 
+	module('_.getset(data) [2]');
 
+
+	test('_.getset(data), using function evaluate', function() {
+		var control = {},
+			obj = _.extend({}, Eventemitter2.prototype);
+
+		obj.sideEffect = {};
+
+
+		obj.state = function(name, state) {
+			return _.getset({
+				context: this,
+				obj: 'states',
+				name: name,
+				value: state,
+				options: {
+					events: 'set-state',
+					iterate: function(name, state) {
+						this.sideEffect[ name ] = state;
+
+						return state;
+					},
+					evaluate: function(state) {
+						return state['eval_value'];
+					}
+				}
+
+			})
+		};
+
+		// listen to ehte set-state events and log them on the control object
+		obj.on('set-state', function(statename, states) {
+			control[statename] = states[statename];
+		});
+
+		// create a test object
+		var a = {
+				eval_value: 'effective val',
+				not_eval: 'lalala'
+			},
+			b = {
+				oo: 'ss',
+				eqweqwe: 'qweqweqwe qwe qwe qe'
+			},
+			c = function() {
+				return 'bananas'
+			};
+
+		// set the states
+		obj.state({ a: a, b: b, c: c });
+
+
+		// check the value returned by get
+		equal(obj.state('a'), a.eval_value, 'value correctly evaluated');
+		equal(obj.state('b'), undefined);
+	});
 }
 });
