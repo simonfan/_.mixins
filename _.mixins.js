@@ -353,9 +353,7 @@ define(['underscore'], function() {
 			} else if (typeof name === 'string' && typeof value !== 'undefined') {
 				// PASS TO THE ITERATOR
 
-				if (typeof data.iterator === 'function') {
-					data.iterator.call(data.context, name, value);
-				}
+				value = (typeof iterator === 'function') ? iterator.call(context, name, value) : value;
 
 				// SET SINGLE
 				return gs.set(context, obj, name, value, options);

@@ -18,6 +18,8 @@ return function() {
 					value: state,
 					iterator: function(name, state) {
 						this.sideEffect[ name ] = state;
+
+						return state;
 					},
 					options: {
 						events: 'set-state',
