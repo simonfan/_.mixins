@@ -7,6 +7,8 @@ return function() {
 			window.control = {};
 			window.obj = _.extend({}, Eventemitter2.prototype);
 
+			obj.sideEffect = {};
+
 
 			obj.state = function(name, state) {
 				return _.getset({
@@ -14,6 +16,9 @@ return function() {
 					obj: 'states',
 					name: name,
 					value: state,
+					iterator: function(name, state) {
+						this.sideEffect[ name ] = state;
+					},
 					options: {
 						events: 'set-state',
 						evaluate: true
@@ -38,6 +43,7 @@ return function() {
 			obj: obj || string,
 			name: string,
 			value: whatever,
+			iterator: function,
 			options: {
 				events: string || array || object || function,
 				evaluate: boolean
@@ -60,6 +66,8 @@ return function() {
 		deepEqual(obj.states.test, teststate, 'test setting correctly saved');
 		deepEqual(control.test, teststate, 'event was correctly emitted');
 
+		// check if sideEffects were correct
+		deepEqual(obj.sideEffect, obj.states, 'side effects correct');
 
 
 
@@ -86,6 +94,10 @@ return function() {
 
 		deepEqual(control, obj.states, 'events correctly fired');
 
+		// check if sideEffects were correct
+		deepEqual(obj.sideEffect, obj.states, 'side effects correct');
+
+
 
 	});
 
@@ -111,6 +123,10 @@ return function() {
 
 		deepEqual(obj.state('a'), obj.states['a'], 'getting simple data correctly');
 		deepEqual(obj.state('c'), obj.states['c'](), 'getting intelligent data correctly');
+
+		// check if sideEffects were correct
+		deepEqual(obj.sideEffect, obj.states, 'side effects correct');
+
 
 
 	});

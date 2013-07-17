@@ -313,6 +313,7 @@ define(['underscore'], function() {
 					obj: obj || string,
 					name: string,
 					value: whatever,
+					iterator: function,
 					options: {
 						events: string || array || object || function,
 						evaluate: boolean
@@ -322,6 +323,7 @@ define(['underscore'], function() {
 			var context = data.context,
 				name = data.name,
 				value = data.value,
+				iterator = data.iterator,
 				options = data.options || {},
 				obj;
 
@@ -341,6 +343,7 @@ define(['underscore'], function() {
 						obj: obj,
 						name: name,
 						value: val,
+						iterator: iterator,
 						options: options
 					});
 				});
@@ -348,6 +351,12 @@ define(['underscore'], function() {
 				return this;
 
 			} else if (typeof name === 'string' && typeof value !== 'undefined') {
+				// PASS TO THE ITERATOR
+
+				if (typeof data.iterator === 'function') {
+					data.iterator.call(data.context, name, value);
+				}
+
 				// SET SINGLE
 				return gs.set(context, obj, name, value, options);
 			} else {
