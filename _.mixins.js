@@ -227,22 +227,6 @@ define(['underscore'], function() {
 	////////////////////////////
 	var gs = {};
 
-	gs.set = function(context, obj, name, value, options) {
-		// only set if the new value is different from the old value
-		if (obj[ name ] !== value) {
-			// set
-			obj[ name ] = value;
-
-			// if there should be emitted any kind of events..
-			if (options.events) {
-				gs.emit(context, options.events, name, obj);
-			}
-		}
-
-		return this;
-	};
-
-
 	gs.emit = function(context, events, propname, obj) {
 		// determine the emitting method
 		var emit = typeof context.emit === 'function' ? context.emit : typeof context.trigger === 'function' ? context.trigger : false;
@@ -299,26 +283,84 @@ define(['underscore'], function() {
 		return context;
 	};
 
-	gs.get = function(context, obj, name, options) {
-		var value = obj[ name ];
+	gs.set = function(context, obj, name, value, options) {
 
-		if (typeof value !== 'undefined') {
-			// check if there is an evaluation to be made
-			if (options.evaluate) {
+		///////////
+		/// 1: get the object on which the property should be set
+		///////////
 
-				
-				if (typeof options.evaluate === 'boolean' && typeof value === 'function') {
-					// if evaluate is a boolean (remember it is not a falsey value) and the value is a function itself
-					value = value.call(context);
+		// if obj is an array, just get the first object from the array
+		// otherwise, keep it as it is.
+		obj = _.isArray(obj) ? obj[0] : obj;
 
-				} else if (typeof options.evaluate === 'function') {
-					// if options.evaluate is a function, call it and pass it the value
-					value = options.evaluate.call(context, value);
-				}
+		// now that the obj is definetely not an array,
+		// if it is a string, it is a namespace.
+		if (typeof obj === 'string') {
+			// obj is a namespace. Get the object or create it on the context object
+			// prevent obj from being non-object
+			// if there is no obj, create the object on the context
+			context[obj] = obj = context[obj] || {};
+		}
+
+		// only set if the new value is different from the old value
+		if (obj[ name ] !== value) {
+			// set
+			obj[ name ] = value;
+
+			// if there should be emitted any kind of events..
+			if (options.events) {
+				gs.emit(context, options.events, name, obj);
 			}
+		}
 
-		} else if (typeof options.default !== 'undefined') {
-			value = options.default;
+		return this;
+	};
+
+	gs.get = function(context, obj, name, options) {
+		
+
+		///////////////////
+		//// 1: get a list of possible property owners
+		////	property owners are objects that may contain the required property
+		///////////////////
+
+		// if obj is an array, leave it be as it is
+		// if it is not an array, transform it into a single element array
+		// just to fit in the _.find function
+		var objects = _.isArray(obj) ? obj : [obj];
+
+		// map the objects 
+		objects = _.map(objects, function(obj, index) {
+			return typeof obj === 'string' ? context[ obj ] || {} : obj; 
+		});
+
+		//////////////////
+		//// 2: find the property owner
+		//////////////////
+		// find the first object that has the key
+		var owner = _.find(objects, function(object, index) {
+				return typeof object[ name ] !== 'undefined';
+			}),
+			value = typeof owner === 'object' ? owner[ name ] : undefined;
+
+		////////////////
+		/// 3: evaluate results
+		////////////////
+		/// OBS: any implementation of default value should be made here:
+		///      just define a function evaluation that returns the default value if the
+		///      value given is undefined.
+
+		// check if there is an evaluation to be made
+		if (options.evaluate) {
+
+			if (typeof options.evaluate === 'boolean' && typeof value === 'function') {
+				// if evaluate is a boolean (remember it is not a falsey value) and the value is a function itself
+				value = value.call(context);
+
+			} else if (typeof options.evaluate === 'function') {
+				// if options.evaluate is a function, call it and pass it the value
+				value = options.evaluate.call(context, value);
+			}
 		}
 
 		return value;
@@ -344,15 +386,7 @@ define(['underscore'], function() {
 				name = data.name,
 				value = data.value,
 				options = data.options || {},
-				obj;
-
-			// prevent obj from being non-object
-			// if there is no obj, create the object on the context
-			if (typeof data.obj === 'string') {
-				context[data.obj] = obj = context[data.obj] || {};
-			} else {
 				obj = data.obj;
-			}
 
 			if (typeof name === 'object') {
 				// LOOP SET

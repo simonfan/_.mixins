@@ -190,5 +190,57 @@ return function() {
 		equal(obj.state('a'), a.eval_value, 'value correctly evaluated');
 		equal(obj.state('b'), undefined);
 	});
+
+
+	test('using array of objects to get from', function() {
+		var obj = {};
+
+		/// a list of objects
+		obj.prioritaire = {
+			banana: 'banana',
+			apple: 'apple',
+		};
+
+		obj.secondpriority = {
+			pineapple: 'pineapple',
+		};
+
+		obj.thirdpriority = {
+			watermelon: 'watermelon',
+		};
+
+
+		obj.value = function(name, value) {
+			return _.getset({
+				context: this,
+				obj: ['prioritaire','secondpriority','thirdpriority'],
+				name: name,
+				value: value,
+				options: {}
+			});
+		};
+
+
+
+		equal(obj.value('banana'), obj.prioritaire.banana, 'got from prioritaire');
+		equal(obj.value('watermelon'), obj.thirdpriority.watermelon, 'got data from thirdpriority');
+		equal(obj.value('pineapple'), obj.secondpriority.pineapple, 'got data from secondpriority');
+
+
+		// set a watermelon value on the object
+		// expect the next time watermelon is required, the prioritaire value to be returned
+		obj.value('watermelon', 'prioritaire watermelon');
+
+		equal(obj.value('watermelon'), 'prioritaire watermelon', 'value correctly overwritten');
+
+
+		// delete the watermelon value on prioritaire
+		// expect things to fall back to the original configuration
+		delete obj.prioritaire.watermelon;
+		equal(obj.value('watermelon'), obj.thirdpriority.watermelon, 'data back to original');
+
+	});
+
+
 }
 });
