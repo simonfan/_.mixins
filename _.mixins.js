@@ -302,18 +302,23 @@ define(['underscore'], function() {
 	gs.get = function(context, obj, name, options) {
 		var value = obj[ name ];
 
-		// check if there is an evaluation to be made
-		if (options.evaluate) {
+		if (typeof value !== 'undefined') {
+			// check if there is an evaluation to be made
+			if (options.evaluate) {
 
-			
-			if (typeof options.evaluate === 'boolean' && typeof value === 'function') {
-				// if evaluate is a boolean (remember it is not a falsey value) and the value is a function itself
-				value = value.call(context);
+				
+				if (typeof options.evaluate === 'boolean' && typeof value === 'function') {
+					// if evaluate is a boolean (remember it is not a falsey value) and the value is a function itself
+					value = value.call(context);
 
-			} else if (typeof options.evaluate === 'function') {
-				// if options.evaluate is a function, call it and pass it the value
-				value = options.evaluate.call(context, value);
+				} else if (typeof options.evaluate === 'function') {
+					// if options.evaluate is a function, call it and pass it the value
+					value = options.evaluate.call(context, value);
+				}
 			}
+
+		} else if (typeof options.default !== 'undefined') {
+			value = options.default;
 		}
 
 		return value;
