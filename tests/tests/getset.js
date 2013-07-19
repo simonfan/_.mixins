@@ -279,5 +279,58 @@ return function() {
 	});
 
 
+
+
+	test('using a function in the name field', function() {
+		var obj = {};
+
+		/// a list of objects
+		var obj1 = {
+				id: 'obj1',
+				apple: 'apple',
+			},
+			obj2 = {
+				id: 'obj2',
+				pineapple: 'pineapple',
+			};
+
+
+		obj.obj = function(object) {
+
+			var name, value;
+
+			if (typeof object === 'object') {
+				// set!
+				name = object.id;
+				value = object;
+
+			} else if (typeof object === 'string') {
+				// get!
+				name = object;
+			}
+
+			return _.getset({
+				context: this,
+				obj: ['prioritaire','secondpriority','thirdpriority'],
+				name: name,
+				value: value,
+			});
+		};
+
+
+		// set obj1 and obj2;
+		obj.obj(obj1);
+		obj.obj(obj2);
+
+		// check!
+		deepEqual(obj.obj('obj2'), obj2, 'second obj correctly set');
+		deepEqual(obj.obj('obj1'), obj1, 'first obj correctly set');
+
+
+		console.log(obj);
+	});
+
+
+
 }
 });
