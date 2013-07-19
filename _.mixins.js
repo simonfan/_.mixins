@@ -408,9 +408,28 @@ define(['underscore'], function() {
 
 				// SET SINGLE
 				return gs.set(context, obj, name, value, options);
-			} else {
+
+			} else if (typeof name === 'string') {
 				// GET 
 				return gs.get(context, obj, name, options);
+
+			} else {
+				// GET THE OBJECT ITSELF
+				
+				// if obj is an array, just get the first object from the array
+				// otherwise, keep it as it is.
+				obj = _.isArray(obj) ? obj[0] : obj;
+
+				// now that the obj is definetely not an array,
+				// if it is a string, it is a namespace.
+				if (typeof obj === 'string') {
+					// obj is a namespace. Get the object or create it on the context object
+					// prevent obj from being non-object
+					// if there is no obj, create the object on the context
+					context[obj] = obj = context[obj] || {};
+				}
+
+				return obj;
 			}
 		},
 	});

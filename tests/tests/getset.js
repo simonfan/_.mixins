@@ -325,9 +325,28 @@ return function() {
 		// check!
 		deepEqual(obj.obj('obj2'), obj2, 'second obj correctly set');
 		deepEqual(obj.obj('obj1'), obj1, 'first obj correctly set');
+	});
 
 
-		console.log(obj);
+
+
+	test('no arguments, just get the object', function() {
+		var obj = {};
+
+		/// a list of objects
+		obj.prioritaire = { banana: 'banana' };
+
+
+		obj.obj = function(name, value) {
+			return _.getset({
+				context: this,
+				obj: ['prioritaire','secondpriority','thirdpriority'],
+				name: name,
+				value: value,
+			});
+		};
+
+		deepEqual(obj.prioritaire, obj.obj());
 	});
 
 
