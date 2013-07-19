@@ -242,5 +242,42 @@ return function() {
 	});
 
 
+	test('setting a default value through evaluate option', function() {
+		var obj = {};
+
+		/// a list of objects
+		obj.prioritaire = {
+			banana: 'banana',
+			apple: 'apple',
+		};
+
+		obj.secondpriority = {
+			pineapple: 'pineapple',
+		};
+
+		obj.thirdpriority = {
+			watermelon: 'watermelon',
+		};
+
+
+		obj.value = function(name, value) {
+			return _.getset({
+				context: this,
+				obj: ['prioritaire','secondpriority','thirdpriority'],
+				name: name,
+				value: value,
+				options: {
+					evaluate: function(value) {
+						return (typeof value === 'undefined') ? 'default value' : value;
+					}
+				}
+			});
+		};
+
+
+		equal(obj.value('not_real'), 'default value', 'default correctly set')
+	});
+
+
 }
 });
