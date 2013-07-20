@@ -451,11 +451,19 @@ define(['underscore','jquery'], function(undef, $) {
 
 			var first_arg_is_obj = typeof first_arg === 'object',
 				// if the first argument is an object,
-				// then it should be considered an common object.
-				// otherwise, there is no common object
-				common = first_arg_is_obj ? first_arg : {},
+				// then it should be considered an options object.
+				// otherwise, there is no options object
+				options = first_arg_is_obj ? first_arg : {},
 
-				// if the first argument is an common object,
+				// the common object
+				common = options.common || {},
+
+				// the error handler
+				err = options.err || function() {
+
+				},
+
+				// if the first argument is an options object,
 				// then the tasks are all the other arguments
 				// otherwise, all arguments are tasks
 				tasks = first_arg_is_obj ? _.args(arguments, 1) : arguments,
@@ -482,6 +490,9 @@ define(['underscore','jquery'], function(undef, $) {
 
 					return typeof res !== 'undefined' ? res : defer;
 				});
+
+				// set error handler
+				lastdefer.fail(err);
 			});
 
 			// return a defer object.
