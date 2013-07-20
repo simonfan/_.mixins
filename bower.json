@@ -1,14 +1,13 @@
 {
-	"name": "_.mixins",
-	"version": "1.1.0",
-	"dependencies": {
-		"underscore": "latest",
-		"requirejs": "latest"
-	},
-
-	"devDependencies": {
-	    "qunit": "latest"
-	},
-
-	"main": "_.mixins.js"
+  "name": "_.mixins",
+  "version": "1.1.0",
+  "dependencies": {
+    "underscore": "latest",
+    "requirejs": "latest",
+    "jquery": "~2.0.3"
+  },
+  "devDependencies": {
+    "qunit": "latest"
+  },
+  "main": "_.mixins.js"
 }

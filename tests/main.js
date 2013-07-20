@@ -3,6 +3,7 @@ require.config({
 	baseUrl: '',
 	paths: {
 		// basic libraries
+		'jquery': 'components/jquery/jquery',
 		'underscore': 'components/underscore/underscore',
 
 		// test purpose libraries
@@ -22,6 +23,7 @@ require.config({
 		'args-tests': 'tests/args',
 		'branch-tests': 'tests/branch',
 		'getset-tests': 'tests/getset',
+		'asynch-tests': 'tests/asynch',
 	},
 	shim: {
 		'backbone': {

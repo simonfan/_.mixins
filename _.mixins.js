@@ -1,4 +1,4 @@
-define(['underscore'], function() {
+define(['underscore','jquery'], function(undef, $) {
 
 	//////// INTERFACE /////////
 
@@ -433,6 +433,61 @@ define(['underscore'], function() {
 			}
 		},
 	});
+
+
+
+
+
+
+
+
+
+	/////////////////////////////
+	//////// asynch /////////////
+	/////////////////////////////
+	_.mixin({
+		// _.asynch(common_obj, func1, func2, func3);
+		asynch: function(first_arg) {
+
+			var first_arg_is_obj = typeof first_arg === 'object',
+				// if the first argument is an object,
+				// then it should be considered an common object.
+				// otherwise, there is no common object
+				common = first_arg_is_obj ? first_arg : {},
+
+				// if the first argument is an common object,
+				// then the tasks are all the other arguments
+				// otherwise, all arguments are tasks
+				tasks = first_arg_is_obj ? _.args(arguments, 1) : arguments,
+				lastdefer = true;
+
+			_.each(tasks, function (task, order) {
+				/*
+					This code is pretty tricky:
+					1: lastdefer starts as true, so that the first task is instantly run.
+					2: lsatdefer value is updated at each task loop.
+					3: 'when' lastdefer is resolved, a function creates a new defer
+						and passes it to the next task. 
+					4: if the next task returns a not undefined object, it is set as 
+						the 'lastdefer'. This is done so that tasks may return a promise instead 
+						of calling next function.
+				*/
+				
+				// only start the new task when the previous one is finished.
+				lastdefer = $.when(lastdefer).then(function() {
+					// create the defer object.
+					var defer = $.Deferred(),
+						next = defer.resolve,
+						res = task(next, common);
+
+					return typeof res !== 'undefined' ? res : defer;
+				});
+			});
+
+			// return a defer object.
+			return lastdefer;
+		},
+	})
 
 
 

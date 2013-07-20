@@ -5,6 +5,7 @@ var deps = [
 	'args-tests',
 	'branch-tests',
 	'getset-tests',
+	'asynch-tests',
 ];
 
 
