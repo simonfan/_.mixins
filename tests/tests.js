@@ -6,6 +6,7 @@ var deps = [
 	'branch-tests',
 	'getset-tests',
 	'asynch-tests',
+	'mapo-tests',
 ];
 
 

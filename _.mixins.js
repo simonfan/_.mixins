@@ -447,13 +447,13 @@ define(['underscore','jquery'], function(undef, $) {
 	/////////////////////////////
 	_.mixin({
 		// _.asynch(common_obj, func1, func2, func3);
-		asynch: function(first_arg) {
+		asynch: function(options) {
 
-			var first_arg_is_obj = typeof first_arg === 'object',
+			var first_arg_is_object = typeof options === 'object',
 				// if the first argument is an object,
 				// then it should be considered an options object.
 				// otherwise, there is no options object
-				options = first_arg_is_obj ? first_arg : {},
+				options = first_arg_is_object ? options : {},
 
 				// the common object
 				common = options.common || {},
@@ -463,11 +463,32 @@ define(['underscore','jquery'], function(undef, $) {
 
 				},
 
+				// the list of the names of the tasks to be executed
+				map = options.map,
+
+				// the function to be run before each task
+				before = options.before || function(){},
+
+				// the function to be run after each task
+				after = options.after || function(){},
+
+				// context in which the functions should be called
+				context = options.context || window,
+				lastdefer = true,
+				tasks;
+
+			// define the tasks array
+			if (first_arg_is_object) {
 				// if the first argument is an options object,
-				// then the tasks are all the other arguments
-				// otherwise, all arguments are tasks
-				tasks = first_arg_is_obj ? _.args(arguments, 1) : arguments,
-				lastdefer = true;
+				// then there are two possibilities:
+				//	1: there is a 'tasks' property in the options object itself
+				//	2: tasks were passed in as arguments
+				tasks = options.tasks || _.args(arguments, 1);
+			} else {
+				// if the first argument is not an options object
+				// the tasks are the arguments object itself.
+				tasks = arguments;
+			}
 
 			_.each(tasks, function (task, order) {
 				/*
@@ -483,10 +504,21 @@ define(['underscore','jquery'], function(undef, $) {
 				
 				// only start the new task when the previous one is finished.
 				lastdefer = $.when(lastdefer).then(function() {
+
+					// call the after function
+					if (order !== 0) {
+						var lasttask = typeof map === 'undefined' ? order - 1 : map[ order - 1 ];
+						after.call(context, lasttask);
+					}
+
+					// call the before function
+					var currtask = typeof map === 'undefined' ? order : map[ order ];
+					before.call(context, currtask);
+
 					// create the defer object.
 					var defer = $.Deferred(),
 						next = defer.resolve,
-						res = task(next, common);
+						res = task.call(context, next, common);
 
 					return typeof res !== 'undefined' ? res : defer;
 				});
@@ -495,9 +527,33 @@ define(['underscore','jquery'], function(undef, $) {
 				lastdefer.fail(err);
 			});
 
+			// call the last after
+			lastdefer.then(function() {
+				var lasttask = typeof map === 'undefined' ? tasks.length - 1 : map[ tasks.length -1 ];
+				after.call(context, lasttask);
+			})
+
 			// return a defer object.
 			return lastdefer;
 		},
+	});
+
+
+
+
+	//////////////////////
+	//////// mapo ////////
+	//////////////////////
+	_.mixin({
+		mapo: function(obj, iter) {
+			var res = {};
+			
+			_.each(obj, function(value, name) {
+				res[ name ] = iter(value, name);
+			});
+
+			return res;
+		}
 	})
 
 

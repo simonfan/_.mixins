@@ -24,6 +24,7 @@ require.config({
 		'branch-tests': 'tests/branch',
 		'getset-tests': 'tests/getset',
 		'asynch-tests': 'tests/asynch',
+		'mapo-tests': 'tests/mapo',
 	},
 	shim: {
 		'backbone': {
