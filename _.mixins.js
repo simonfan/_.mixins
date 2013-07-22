@@ -358,8 +358,8 @@ define(['underscore','jquery'], function(undef, $) {
 				value = value.call(context);
 
 			} else if (typeof options.evaluate === 'function') {
-				// if options.evaluate is a function, call it and pass it the value
-				value = options.evaluate.call(context, value);
+				// if options.evaluate is a function, call it and pass it the value as first parameter and name as second
+				value = options.evaluate.call(context, name, value);
 			}
 		}
 

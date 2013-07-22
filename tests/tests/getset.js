@@ -156,7 +156,7 @@ return function() {
 
 						return state;
 					},
-					evaluate: function(state) {
+					evaluate: function(name, state) {
 						return state['eval_value'];
 					}
 				}
@@ -267,7 +267,7 @@ return function() {
 				name: name,
 				value: value,
 				options: {
-					evaluate: function(value) {
+					evaluate: function(name, value) {
 						return (typeof value === 'undefined') ? 'default value' : value;
 					}
 				}
