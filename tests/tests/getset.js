@@ -351,5 +351,34 @@ return function() {
 
 
 
+	test('overwrite set to false', function() {
+		var obj = {};
+
+		obj.props = {
+			prop1: 'banana'
+		};
+
+
+		obj.setprop = function(name, value) {
+			return _.getset({
+				context: this,
+				obj: 'props',
+				name: name,
+				value: value,
+				options: {
+					overwrite: false,
+				}
+			});
+		};
+
+
+		obj.setprop('prop1', 'apple');
+
+		deepEqual(obj.setprop('prop1'), 'banana');
+
+	});
+
+
+
 }
 });

@@ -302,9 +302,9 @@ define(['underscore','jquery'], function(undef, $) {
 			context[obj] = obj = context[obj] || {};
 		}
 
-		// if object is already set and the noOverwrite option is set to true,
+		// if object is already set and the overwrite option is set to false or undefined,
 		// return without setting
-		if (typeof obj[ name ] !== 'undefined' && options.noOverwrite) {
+		if (typeof obj[ name ] !== 'undefined' && (!options.overwrite && typeof options.overwrite !== 'undefined') ) {
 			return this;
 
 		} else {
