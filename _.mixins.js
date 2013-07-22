@@ -302,18 +302,25 @@ define(['underscore','jquery'], function(undef, $) {
 			context[obj] = obj = context[obj] || {};
 		}
 
-		// only set if the new value is different from the old value
-		if (obj[ name ] !== value) {
-			// set
-			obj[ name ] = value;
+		// if object is already set and the noOverwrite option is set to true,
+		// return without setting
+		if (typeof obj[ name ] !== 'undefined' && options.noOverwrite) {
+			return this;
 
-			// if there should be emitted any kind of events..
-			if (options.events) {
-				gs.emit(context, options.events, name, obj);
+		} else {
+			// only set if the new value is different from the old value
+			if (obj[ name ] !== value) {
+				// set
+				obj[ name ] = value;
+
+				// if there should be emitted any kind of events..
+				if (options.events) {
+					gs.emit(context, options.events, name, obj);
+				}
 			}
-		}
 
-		return this;
+			return this;
+		}
 	};
 
 	gs.get = function(context, obj, name, options) {
